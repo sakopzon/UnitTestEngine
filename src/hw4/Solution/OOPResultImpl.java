@@ -18,11 +18,11 @@ public class OOPResultImpl implements OOPResult{
 	}
 
 	@Override
-	public boolean equals(Object ¢){
-		return ¢ == null ? this == null : (¢ instanceof OOPResultImpl && ((OOPResultImpl)¢).equals(this));
+	public boolean equals(Object Â¢){
+		return Â¢ == null ? this == null : (Â¢ instanceof OOPResultImpl && ((OOPResultImpl)Â¢).equals(this));
 	}
 	
-	private boolean equals(OOPResultImpl ¢){
-		return getMessage().equals(¢.getMessage()) && getResultType().equals(¢.getResultType());
+	private boolean equals(OOPResultImpl Â¢){
+		return getMessage().equals(Â¢.getMessage()) && getResultType().equals(Â¢.getResultType());
 	}
 }

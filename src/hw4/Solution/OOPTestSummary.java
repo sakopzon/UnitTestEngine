@@ -5,6 +5,9 @@ import java.util.Map;
 import hw4.Provided.OOPResult;
 import hw4.Provided.OOPResult.OOPTestResult;
 
+/**
+ * [[SuppressWarningsSpartan]]
+ */
 public class OOPTestSummary {
 
 	Map<String, OOPResult> testMap;

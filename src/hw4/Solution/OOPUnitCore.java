@@ -2,8 +2,8 @@ package hw4.Solution;
 
 public class OOPUnitCore {
 	
-	public static OOPUnitCore assertEquals(Object expected, Object actual) {
-		return null;
+	public static void assertEquals(Object expected, Object actual) {
+	
 	}
 	
 	public static OOPTestSummary runClass(Class<?> testClass) {
