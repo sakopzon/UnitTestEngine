@@ -11,7 +11,7 @@ public @interface OOPTest {
 
 	boolean testThrows() default false;
 	
-	Class<?> exception();
+	Class<?> exception() default Object.class;
 	
 	int order();
 	

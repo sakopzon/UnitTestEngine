@@ -3,6 +3,7 @@ package hw4.Solution;
 import java.util.Map;
 
 import hw4.Provided.OOPResult;
+import hw4.Provided.OOPResult.OOPTestResult;
 
 public class OOPTestSummary {
 
@@ -13,14 +14,18 @@ public class OOPTestSummary {
 	}
 	
 	public int getNumSuccesses() {
-		return 0;
+		return occurenceCounter(OOPTestResult.SUCCESS);
 	}
 	
 	public int getNumFailures() {
-		return 0;
+		return occurenceCounter(OOPTestResult.FAILURE);
 	}
 	
 	public int getNumErrors() {
-		return 0;
+		return occurenceCounter(OOPTestResult.ERROR);
+	}
+	
+	private int occurenceCounter(OOPTestResult r) {
+		return (int) testMap.values().stream().filter(i->i.getResultType().equals(r)).count();
 	}
 }
