@@ -1,9 +1,12 @@
 package hw4.Solution;
 
+import hw4.Provided.OOPAssertionFailure;
+
 public class OOPUnitCore {
 	
-	public static OOPUnitCore assertEquals(Object expected, Object actual) {
-		return null;
+	public static void assertEquals(Object expected, Object actual) {
+		if(!expected.equals(actual))
+			throw new OOPAssertionFailure(expected, actual);
 	}
 	
 	public static OOPTestSummary runClass(Class<?> testClass) {
