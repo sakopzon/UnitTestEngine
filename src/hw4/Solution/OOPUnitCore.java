@@ -56,7 +56,7 @@ public class OOPUnitCore {
 			e.printStackTrace();
 		}
 		
-		return null;
+		return new OOPTestSummary(resultMap);
 	}
 	
 	private static void runMethodsWithBackup(Object instance, Class<?> testClass, List<Method> methods, OOPResultImpl $) {
