@@ -56,7 +56,7 @@ public class OOPUnitCore {
 			e.printStackTrace();
 		}
 		
-		return null;
+		return new OOPTestSummary(resultMap);
 	}
 	
 	private static OOPResult runTest(Object instance, Class<?> testClass, Method m, List<Method> beforeMethods, List<Method> afterMethods){
