@@ -140,23 +140,6 @@ public class OOPUnitCore {
 		return 0;
 	}
 	
-	/**
-	 * @param instance
-	 * @param testClass
-	 * @param m
-	 * @return false <b>iff</b> method has thrown exception;
-	 */
-	private static boolean runMethodWithBackup(Object instance, Class<?> testClass, Method m){
-		Object backup = backup(instance,testClass);
-		try {
-			m.invoke(instance);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			instance = backup;
-			return false;
-		}
-		return true;
-	}
-	
 	private static Object backup(Object instance, Class<?> testClass) {
 		
 		assert instance != null : "Something is really fucked up. SOS";
