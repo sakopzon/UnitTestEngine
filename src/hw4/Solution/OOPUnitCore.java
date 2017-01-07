@@ -17,6 +17,7 @@ import java.lang.reflect.Method;
 
 import hw4.Provided.OOPAssertionFailure;
 import hw4.Provided.OOPResult;
+import hw4.Provided.OOPResult.OOPTestResult;
 
 public class OOPUnitCore {
 	
@@ -59,32 +60,37 @@ public class OOPUnitCore {
 	}
 	
 	private static OOPResult runTest(Object instance, Class<?> testClass, Method m, List<Method> beforeMethods, List<Method> afterMethods){
-		boolean errorThrown = false;
-		
-		// find befores
+		OOPResultImpl $ = new OOPResultImpl();
+		$.result = OOPTestResult.SUCCESS;
+		// find relevant before methods.
 		List<Method> applicableBeforeMethods = beforeMethods.stream()
 													.filter(beforeMethod->!containsMethod(m,beforeMethod))
 														.collect(Collectors.toList());
-		// run befores
-		for(Method beforeMethod : applicableBeforeMethods)
-			if(runMethodWithBackup(instance,testClass,beforeMethod))
-				errorThrown = true;
+		// run before methods.
+		for(Method beforeMethod : applicableBeforeMethods){
+			Object backup = backup(instance,testClass);
+			try {
+				beforeMethod.invoke(instance);
+			} catch (Throwable e) {
+				instance = backup;
+				$.result = OOPTestResult.ERROR;
+				$.message = e.getClass().getName();
+			}
+		}
 
-		//Class<?> ec;
-		//if(m.getAnnotation(OOPTest.class).testThrows())
-		//	ec = m.getAnnotation(OOPTest.class).exception();
-		
 		try {
-			try{
-				m.invoke(instance);
-			}
-			catch(Exception t){
-				if((t instanceof m.getAnnotation(OOPTest.class).exception() && m.getAnnotation(OOPTest.class).testThrows())){
-					throw t;
+			m.invoke(instance);
+		}
+		catch(Throwable t){
+			if(!m.getAnnotation(OOPTest.class).testThrows() || !m.getAnnotation(OOPTest.class).exception().isInstance(t))
+				if(t instanceof OOPAssertionFailure && $.result != OOPTestResult.ERROR){
+					$.result = OOPTestResult.FAILURE;
+					$.message = t.getMessage();
 				}
-			}
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			e.printStackTrace();
+				else{
+					$.result = OOPTestResult.ERROR;
+					$.message = t.getClass().getName();
+				}
 		}
 
 		// find afters
@@ -92,11 +98,18 @@ public class OOPUnitCore {
 													.filter(afterMethod->!containsMethod(m,afterMethod))
 														.collect(Collectors.toList());
 		// run afters
-		for(Method afterMethod : applicableAfterMethods)
-			if(runMethodWithBackup(instance,testClass,afterMethod))
-				errorThrown = true;
+		for(Method afterMethod : applicableAfterMethods){
+			Object backup = backup(instance,testClass);
+			try {
+				afterMethod.invoke(instance);
+			} catch (Throwable e) {
+				instance = backup;
+				$.result = OOPTestResult.ERROR;
+				$.message = e.getClass().getName();
+			}
+		}
 		
-		return null;
+		return $;
 	}
 
 	private static boolean containsMethod(Method m, Method beforeMethod) {

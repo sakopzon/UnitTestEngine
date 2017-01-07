@@ -5,6 +5,7 @@ import hw4.Provided.OOPResult;
 public class OOPResultImpl implements OOPResult{
 
 	OOPTestResult result;
+	String message;
 	
 	@Override
 	public OOPTestResult getResultType() {
@@ -13,8 +14,7 @@ public class OOPResultImpl implements OOPResult{
 
 	@Override
 	public String getMessage() {
-		//TODO implement this shit.
-		return "We really need to implement this shit.";
+		return message;
 	}
 
 	@Override
