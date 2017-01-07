@@ -70,7 +70,22 @@ public class OOPUnitCore {
 			if(runMethodWithBackup(instance,testClass,beforeMethod))
 				errorThrown = true;
 
-		//Logic that runs the actual test
+		//Class<?> ec;
+		//if(m.getAnnotation(OOPTest.class).testThrows())
+		//	ec = m.getAnnotation(OOPTest.class).exception();
+		
+		try {
+			try{
+				m.invoke(instance);
+			}
+			catch(Exception t){
+				if((t instanceof m.getAnnotation(OOPTest.class).exception() && m.getAnnotation(OOPTest.class).testThrows())){
+					throw t;
+				}
+			}
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			e.printStackTrace();
+		}
 
 		// find afters
 		List<Method> applicableAfterMethods = afterMethods.stream()
