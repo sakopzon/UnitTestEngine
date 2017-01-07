@@ -57,6 +57,19 @@ public class OOPUnitCore {
 		return new OOPTestSummary(resultMap);
 	}
 	
+	private static void runMethodsWithBackup(Object instance, Class<?> testClass, List<Method> methods, OOPResultImpl $) {
+		for(Method m : methods){
+			Object backup = backup(instance,testClass);
+			try {
+				m.invoke(instance);
+			} catch (Throwable e) {
+				instance = backup;
+				$.result = OOPTestResult.ERROR;
+				$.message = e.getClass().getName();
+			}
+		}
+	}
+	
 	private static OOPResult runTest(Object instance, Class<?> testClass, Method m, List<Method> beforeMethods, List<Method> afterMethods){
 		OOPResultImpl $ = new OOPResultImpl();
 		$.result = OOPTestResult.SUCCESS;
@@ -65,16 +78,7 @@ public class OOPUnitCore {
 													.filter(beforeMethod->!containsMethod(m,beforeMethod))
 														.collect(Collectors.toList());
 		// run before methods.
-		for(Method beforeMethod : applicableBeforeMethods){
-			Object backup = backup(instance,testClass);
-			try {
-				beforeMethod.invoke(instance);
-			} catch (Throwable e) {
-				instance = backup;
-				$.result = OOPTestResult.ERROR;
-				$.message = e.getClass().getName();
-			}
-		}
+		runMethodsWithBackup(instance, testClass, applicableBeforeMethods, $);
 
 		try {
 			m.invoke(instance);
@@ -96,16 +100,7 @@ public class OOPUnitCore {
 													.filter(afterMethod->!containsMethod(m,afterMethod))
 														.collect(Collectors.toList());
 		// run afters
-		for(Method afterMethod : applicableAfterMethods){
-			Object backup = backup(instance,testClass);
-			try {
-				afterMethod.invoke(instance);
-			} catch (Throwable e) {
-				instance = backup;
-				$.result = OOPTestResult.ERROR;
-				$.message = e.getClass().getName();
-			}
-		}
+		runMethodsWithBackup(instance, testClass, applicableAfterMethods, $);
 		
 		return $;
 	}
