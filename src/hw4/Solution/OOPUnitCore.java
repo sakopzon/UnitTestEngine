@@ -73,10 +73,9 @@ public class OOPUnitCore {
 	private static OOPResult runTest(Object instance, Class<?> testClass, Method m, List<Method> beforeMethods, List<Method> afterMethods){
 		OOPResultImpl $ = new OOPResultImpl();
 		$.result = OOPTestResult.SUCCESS;
+		
 		// find relevant before methods.
-		List<Method> applicableBeforeMethods = beforeMethods.stream()
-													.filter(beforeMethod->containsMethod(m,beforeMethod))
-														.collect(Collectors.toList());
+		List<Method> applicableBeforeMethods = getApplicableMethods(beforeMethods, m);
 		// run before methods.
 		runMethodsWithBackup(instance, testClass, applicableBeforeMethods, $);
 
@@ -96,17 +95,21 @@ public class OOPUnitCore {
 		}
 
 		// find afters
-		List<Method> applicableAfterMethods = afterMethods.stream()
-													.filter(afterMethod->!containsMethod(m,afterMethod))
-														.collect(Collectors.toList());
+		List<Method> applicableAfterMethods = getApplicableMethods(afterMethods, m);
 		// run afters
 		runMethodsWithBackup(instance, testClass, applicableAfterMethods, $);
 		
 		return $;
 	}
 
-	private static boolean containsMethod(Method m, Method beforeMethod) {
-		return Arrays.asList(beforeMethod.getAnnotation(OOPBefore.class).value()).contains(m.getName());
+	static List<Method> getApplicableMethods(List<Method> ms, Method m) {
+		return ms.stream()
+				.filter(method->containsMethod(m,method))
+				.collect(Collectors.toList());
+	}
+	
+	private static boolean containsMethod(Method m, Method beforeOrAfterMethod) {
+		return Arrays.asList(beforeOrAfterMethod.getAnnotation(OOPBefore.class).value()).contains(m.getName());
 	}
 
 	private static int methodOrderComparator(Method m1,Method m2){
