@@ -97,7 +97,7 @@ public class OOPUnitCore {
 
 		// find afters
 		List<Method> applicableAfterMethods = afterMethods.stream()
-													.filter(afterMethod->!containsMethod(m,afterMethod))
+													.filter(afterMethod->containsMethod(m,afterMethod))
 														.collect(Collectors.toList());
 		// run afters
 		runMethodsWithBackup(instance, testClass, applicableAfterMethods, $);
@@ -190,8 +190,10 @@ public class OOPUnitCore {
 		}
 		
 		for(Method m : Arrays.asList(testClass.getDeclaredMethods()))
-			if (!ms.stream().anyMatch(method -> method.getName().equals(m.getName())))
+			if (!ms.stream().anyMatch(method -> method.getName().equals(m.getName()))){
+				m.setAccessible(true);
 				ms.add(m);
+			}
 		extractAllMethods(testClass.getSuperclass(),ms);
 	}
 
