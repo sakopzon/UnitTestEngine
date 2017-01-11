@@ -73,9 +73,10 @@ public class OOPUnitCore {
 	private static OOPResult runTest(Object instance, Class<?> testClass, Method m, List<Method> beforeMethods, List<Method> afterMethods){
 		OOPResultImpl $ = new OOPResultImpl();
 		$.result = OOPTestResult.SUCCESS;
-		
 		// find relevant before methods.
-		List<Method> applicableBeforeMethods = getApplicableMethods(beforeMethods, m);
+		List<Method> applicableBeforeMethods = beforeMethods.stream()
+													.filter(beforeMethod->containsBeforeMethod(m,beforeMethod))
+														.collect(Collectors.toList());
 		// run before methods.
 		runMethodsWithBackup(instance, testClass, applicableBeforeMethods, $);
 
@@ -95,21 +96,23 @@ public class OOPUnitCore {
 		}
 
 		// find afters
-		List<Method> applicableAfterMethods = getApplicableMethods(afterMethods, m);
+		List<Method> applicableAfterMethods = afterMethods.stream()
+													.filter(afterMethod->containsAfterMethod(m,afterMethod))
+														.collect(Collectors.toList());
 		// run afters
 		runMethodsWithBackup(instance, testClass, applicableAfterMethods, $);
 		
 		return $;
 	}
 
-	static List<Method> getApplicableMethods(List<Method> ms, Method m) {
-		return ms.stream()
-				.filter(method->containsMethod(m,method))
-				.collect(Collectors.toList());
+	// :(
+	private static boolean containsBeforeMethod(Method m, Method beforeMethod) {
+		return Arrays.asList(beforeMethod.getAnnotation(OOPBefore.class).value()).contains(m.getName());
 	}
-	
-	private static boolean containsMethod(Method m, Method beforeOrAfterMethod) {
-		return Arrays.asList(beforeOrAfterMethod.getAnnotation(OOPBefore.class).value()).contains(m.getName());
+
+	// :(
+	private static boolean containsAfterMethod(Method m, Method afterMethod) {
+		return Arrays.asList(afterMethod.getAnnotation(OOPAfter.class).value()).contains(m.getName());
 	}
 
 	private static int methodOrderComparator(Method m1,Method m2){
@@ -193,10 +196,8 @@ public class OOPUnitCore {
 		}
 		
 		for(Method m : Arrays.asList(testClass.getDeclaredMethods()))
-			if (!ms.stream().anyMatch(method -> method.getName().equals(m.getName()))){
-				m.setAccessible(true);
+			if (!ms.stream().anyMatch(method -> method.getName().equals(m.getName())))
 				ms.add(m);
-			}
 		extractAllMethods(testClass.getSuperclass(),ms);
 	}
 
