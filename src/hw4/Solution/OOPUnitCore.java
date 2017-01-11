@@ -28,7 +28,7 @@ public class OOPUnitCore {
 		if(testClass == null)
 			throw new IllegalArgumentException();
 		List<Annotation> as = Arrays.asList(testClass.getAnnotations());
-		if(as.stream().anyMatch(a -> a instanceof OOPTestClass))
+		if(!as.stream().anyMatch(a -> a instanceof OOPTestClass))
 			throw new IllegalArgumentException();
 		
 		Map<String,OOPResult> resultMap = new HashMap<>();
@@ -75,7 +75,7 @@ public class OOPUnitCore {
 		$.result = OOPTestResult.SUCCESS;
 		// find relevant before methods.
 		List<Method> applicableBeforeMethods = beforeMethods.stream()
-													.filter(beforeMethod->!containsMethod(m,beforeMethod))
+													.filter(beforeMethod->containsMethod(m,beforeMethod))
 														.collect(Collectors.toList());
 		// run before methods.
 		runMethodsWithBackup(instance, testClass, applicableBeforeMethods, $);
@@ -84,8 +84,8 @@ public class OOPUnitCore {
 			m.invoke(instance);
 		}
 		catch(Throwable t){
-			if(!m.getAnnotation(OOPTest.class).testThrows() || !m.getAnnotation(OOPTest.class).exception().isInstance(t))
-				if(t instanceof OOPAssertionFailure && $.result != OOPTestResult.ERROR){
+			if(!m.getAnnotation(OOPTest.class).testThrows() || !m.getAnnotation(OOPTest.class).exception().isInstance(t.getCause()))
+				if(t.getCause() instanceof OOPAssertionFailure && $.result != OOPTestResult.ERROR){
 					$.result = OOPTestResult.FAILURE;
 					$.message = t.getMessage();
 				}
@@ -189,7 +189,7 @@ public class OOPUnitCore {
 			return;
 		}
 		
-		for(Method m : Arrays.asList(testClass.getMethods()))
+		for(Method m : Arrays.asList(testClass.getDeclaredMethods()))
 			if (!ms.stream().anyMatch(method -> method.getName().equals(m.getName())))
 				ms.add(m);
 		extractAllMethods(testClass.getSuperclass(),ms);
