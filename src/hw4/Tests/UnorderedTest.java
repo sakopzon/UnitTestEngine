@@ -23,7 +23,7 @@ public class UnorderedTest {
 		shouldPass(0,a);
 		a++;
 	}
-	@OOPTest()
+	@OOPTest(order = 0)
 	protected void overRideThis(){
 		a=2;
 	}

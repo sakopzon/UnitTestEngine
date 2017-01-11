@@ -13,6 +13,6 @@ public @interface OOPTest {
 	
 	Class<?> exception() default Object.class;
 	
-	int order();
+	int order() default 0;
 	
 }
